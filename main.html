@@ -1,0 +1,944 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Birthday Wish</title>
+    <style>
+        :root {
+            --primary: #ff6b9d;
+            --secondary: #5fd8ff;
+            --accent: #ffe14f;
+            --text: #333;
+            --light: #fff9f9;
+            --object: #A28089;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Neue', cursive, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(#2A7B9B, transparent), linear-gradient(to top left, #57C785, transparent), linear-gradient(to top right, #EDDD53, transparent);
+            background-blend-mode: screen;
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            padding-top: 20px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Puzzle Box Section */
+        .puzzle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .puzzle-box {
+            width: 90%;
+            max-width: 500px;
+            background-color: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            transform-origin: center;
+        }
+        
+        .puzzle-box h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .puzzle-input {
+            padding: 12px 20px;
+            width: 100%;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--secondary);
+            transform: scale(1.05);
+        }
+        
+        /* Shake animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary);
+            opacity: 0;
+            z-index: 101;
+            animation: confetti-fall 5s linear forwards;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Error Message */
+        .error-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 102;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Birthday Header */
+        .birthday-header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .birthday-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            animation: colorChange 5s infinite alternate;
+        }
+        
+        @keyframes colorChange {
+            0% { color: var(--primary); }
+            50% { color: var(--secondary); }
+            100% { color: var(--accent); }
+        }
+        
+        .birthday-header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+        
+        /* Photo Slider */
+        .slider-container {
+            width: 70%;
+            overflow: hidden;
+            margin: 50px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+            height: 400px;
+        }
+        
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .slide-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .slider-nav {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0 20px;
+        }
+        
+        .slider-btn {
+            background-color: rgba(255,255,255,0.7);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+        
+        /* Polaroid Photos */
+        .polaroid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .polaroid {
+            width: 200px;
+            background-color: white;
+            padding: 15px 15px 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: rotate(-5deg);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .polaroid:nth-child(even) {
+            transform: rotate(5deg);
+        }
+        
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .polaroid img {
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+        
+        .polaroid p {
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        /* Sticky Notes */
+        .stickies-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .sticky {
+            width: 200px;
+            padding: 20px;
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+            position: relative;
+            transform: rotate(-2deg);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .sticky:nth-child(odd) {
+            background-color: var(--accent);
+            transform: rotate(2deg);
+        }
+        
+        .sticky:nth-child(2) {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .sticky:nth-child(3n) {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .sticky:nth-child(4n) {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .sticky:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: rgba(255,255,255,0.3);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(-2deg); }
+        }
+        
+        .sticky:nth-child(odd) {
+            animation-name: floatReverse;
+        }
+        
+        @keyframes floatReverse {
+            0%, 100% { transform: translateY(0) rotate(2deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        
+        /* Pocket Diary */
+        .diary {
+            width: 100%;
+            max-width: 500px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .diary-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .diary-header:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .diary-content {
+            padding: 20px;
+            min-height: 200px;
+            position: relative;
+            background-color: #fffdf6;
+        }
+        
+        .diary-page {
+            font-family: Courier, monospace, cursive;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            animation: fadeIn 1s;
+        }
+        
+        .page-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #f5f5f5;
+        }
+        
+        .page-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        .page-count {
+            color: var(--text);
+        }
+        
+        /* Countdown */
+        .countdown-container {
+            text-align: center;
+            margin: 60px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .countdown-container h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .countdown-box {
+            background-color: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 80px;
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .countdown-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Animated Background Elements */
+        .bg-element {
+            position: fixed;
+            z-index: -1;
+            opacity: 0.3;
+            animation: floatElement 15s infinite linear;
+        }
+        
+        .heart {
+            color: var(--primary);
+            font-size: 30px;
+        }
+        
+        .star {
+            color: var(--accent);
+            font-size: 20px;
+        }
+        
+        .circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+        }
+        
+        @keyframes floatElement {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .birthday-header h1 {
+                font-size: 2rem;
+            }
+            
+            .polaroid-container {
+                gap: 20px;
+            }
+            
+            .polaroid {
+                width: 160px;
+            }
+            
+            .stickies-container {
+                gap: 20px;
+            }
+            
+            .sticky {
+                width: 160px;
+            }
+            
+            .slider-container {
+                height: 300px;
+            }
+            
+            .countdown-box {
+                min-width: 60px;
+            }
+            
+            .countdown-number {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .birthday-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .polaroid {
+                width: 130px;
+            }
+            
+            .sticky {
+                width: 140px;
+                padding: 15px;
+            }
+            
+            .countdown {
+                gap: 10px;
+            }
+            
+            .countdown-box {
+                min-width: 50px;
+                padding: 10px;
+            }
+            
+            .countdown-number {
+                font-size: 1.5rem;
+            }
+            
+            .countdown-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Puzzle Box -->
+    <div class="puzzle-container" id="puzzleContainer">
+        <div class="puzzle-box" id="puzzleBox">
+            <h2>🎉 Birthday Puzzle 🎉</h2>
+            <p>What nickname have you been calling me recently?</p>
+            <input type="text" class="puzzle-input" id="puzzleInput" placeholder="Enter the nickname...">
+            <button class="submit-btn" id="submitBtn">Submit</button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container" id="mainContent">
+        <!-- Birthday Header -->
+        <div class="birthday-header">
+            <h1>Happy Birthday To The Amazing Person 🎂</h1>
+            <p>This special day is all about you - the amazing person who lights up my life every single day.</p>
+        </div>
+        
+        <!-- Photo Slider -->
+        <div class="slider-container">
+            <div class="slider" id="slider">
+                <div class="slide">
+                    <img src="img/pic1.jpg" alt="Couple at sunset on beach holding hands">
+                    <div class="slide-caption"><h3>Will Make Best Memories Together</h3></div>
+                </div>
+                <div class="slide">
+                    <img src="img/pic2.jpg" alt="Couple laughing during dinner date">
+                    <div class="slide-caption"><h3>Every Moment With You is Special</h3></div>
+                </div>
+                <div class="slide">
+                    <img src="img/pic3.jpg" alt="Couple posing together at a scenic viewpoint">
+                    <div class="slide-caption"><h3>Making Memories That Last Forever</h3></div>
+                </div>
+            </div>
+            <div class="slider-nav">
+                <button class="slider-btn" id="prevBtn">←</button>
+                <button class="slider-btn" id="nextBtn">→</button>
+            </div>
+        </div>
+        
+        <!-- Warm Message -->
+        <div style="text-align: center; margin: 40px 0;">
+            <p style="font-size: 1.2rem; line-height: 1.8; max-width: 700px; margin: 0 auto;">
+                From the day we met, my life became brighter. Your smile, your laugh, the way you see the world - 
+                everything about you is perfectly imperfect.<br>
+                Today is your day, and I want you to feel as special as you make me feel every day.
+            </p>
+        </div>
+        
+        <!-- Polaroid Photos -->
+        <div class="polaroid-container">
+            <div class="polaroid">
+                <img src="img/pic4.jpg" alt="Couple selfie at a concert">
+                <p>Nice to Meet You</p>
+            </div>
+            <div class="polaroid">
+                <img src="img/pic5.jpg" alt="Couple cooking dinner together">
+                <p>Where You have Been?</p>
+            </div>
+            <div class="polaroid">
+                <img src="img/pic6.jpg" alt="Couple sleeping on couch">
+                <p>Why so late to meet me?</p>
+            </div>
+            <div class="polaroid">
+                <img src="img/pic7.jpg" alt="Couple sleeping on couch">
+                <p>Now Don't Go anywhere even if you are Late.</p>
+            </div>
+        </div>
+        
+        <!-- Sticky Notes -->
+        <div class="stickies-container">
+            <div class="sticky">
+                <h3>Things I love about you:</h3>
+                <ul style="padding-left: 20px;">
+                    <li>How You put me First in every situation &#9829;</li>
+                    <li>How you laugh at my jokes</li>
+                    <li>Your terrible jokes</li>
+                </ul>
+            </div>
+            <div class="sticky">
+                <h3>Top 3 Moments:</h3>
+                <ol style="padding-left: 20px;">
+                    <li>Making me feel Comfortable</li>
+                    <li>Make my bad mood into the best one </li>
+                    <li>Always respects me and my family</li>
+                </ol>
+            </div>
+            <div class="sticky">
+                <h3>Silly Promises:</h3>
+                <ul style="padding-left: 20px;">
+                    <li>Always steal your hoodies &#9829;</li>
+                    <li>Never let you live in peace &#10084;</li>
+                    <li>Keep testing your patience limit :)</li>
+                </ul>
+            </div>
+            <div class="sticky">
+                <h3>Things I tolarate:</h3>
+                <ul style="padding-left: 20px;">
+                    <li>For being correct and logical, when I'm not 😏</li>
+                    <li>The way irritates me</li>
+                    <li>And the way I don't Mind 😍</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Pocket Diary -->
+        <div class="diary">
+            <div class="diary-header">
+                <h3>My Secret Diary 📕</h3>
+            </div>
+            <div class="diary-content">
+                <div class="diary-page" id="page1">
+                    Dear Diary,<br><br>
+                    I may never be able to tell you this, but I love spending time with you more than anything else in this world.You not just a moment of happiness, You are my favourite activity, my comfort. Your eyes makes me smile and your presence kills all my insecurities. You are not just someone I care for, You are someone Whom I never want to lose.<br><br>
+                    P.S. Annoying you is my fav part-time.🤗
+                </div>
+                <div class="diary-page hidden" id="page2">
+                    My Would be Better-Half 🔖,<br><br>
+                    I never get attach to someone so easily, but with you, I got attached to you so easily. Attached to you in ways I can't even explain. I care about you more than you realise. I appreciate you more than you will ever know<br><br>
+                    The way your giggles...:) 💞
+                </div>
+                <div class="diary-page hidden" id="page3">
+                    To Me,<br><br>
+                    Sometimes I can't tell you how I feel. I maybe angry at you but still I can't stop talking to you, Because you are someone I just can't let go of myself. Sometimes even I am worse & you have to deal with it too. I go through alot sometimes but at the end of the day I'm happy knowing that " I have You " by my side <br>
+                    - Forever<br>
+                    Here's to a million more unperfect perfect moments.🎀
+                </div>
+                <div class="diary-page hidden" id="page3">
+                    My intentions,<br><br>
+                    I just want to treat you the way you have always deserved. To make you feel truly seen, heard, and valued every single day. To bring you real happiness and honestly, and to be the person who reminds you how much you matter, even when things get tough. I am not perfect, but promise to always give my best, to be honest and open with you, and to never give up on us or make you question how deeply you're loved.<br>
+                    - Forever<br>
+                    Promise! 💓
+                </div>
+            </div>
+            <div class="page-controls">
+                <button class="page-btn" id="prevPage">Previous</button>
+                <span class="page-count">Page <span id="currentPage">1</span> of 4</span>
+                <button class="page-btn" id="nextPage">Next</button>
+            </div>
+        </div>
+        
+        <!-- Countdown -->
+        <div class="countdown-container">
+            <h2>Countdown to Our Next Adventure!</h2>
+            <div class="countdown" id="countdown">
+                <div class="countdown-box">
+                    <div class="countdown-number" id="days">00</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-number" id="hours">00</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-number" id="minutes">00</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-number" id="seconds">00</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Puzzle Logic
+        const puzzleContainer = document.getElementById('puzzleContainer');
+        const puzzleBox = document.getElementById('puzzleBox');
+        const puzzleInput = document.getElementById('puzzleInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const mainContent = document.getElementById('mainContent');
+        
+        const correctAnswer = "defective piece"; // Change this to the actual nickname
+        
+        submitBtn.addEventListener('click', checkAnswer);
+        puzzleInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkAnswer();
+        });
+        
+        function checkAnswer() {
+            const userAnswer = puzzleInput.value.trim().toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                // Correct answer
+                celebrate();
+                
+                // Show funny reaction before revealing content
+                setTimeout(() => {
+                    puzzleBox.innerHTML = `
+                        <h2>Ugh... Fine...</h2>
+                        <p style="margin-bottom: 20px;">You got it right... THIS TIME.</p>
+                        <img src="img/pic7.jpg" alt="Cartoon character rolling eyes while secretly smiling" style="width: 150px; margin-bottom: 20px;">
+                        <button class="submit-btn" id="continueBtn">Show Me the Birthday Magic!</button>
+                    `;
+                    
+                    document.getElementById('continueBtn').addEventListener('click', () => {
+                        puzzleContainer.style.opacity = '0';
+                        setTimeout(() => {
+                            puzzleContainer.classList.add('hidden');
+                            mainContent.classList.remove('hidden');
+                            createBackgroundElements();
+                        }, 500);
+                    });
+                }, 1000);
+            } else {
+                // Wrong answer
+                puzzleBox.classList.add('shake');
+                setTimeout(() => {
+                    puzzleBox.classList.remove('shake');
+                }, 500);
+                
+                // Show angry message
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message';
+                errorMsg.textContent = 'Ugh, try again you idiot!';
+                document.body.appendChild(errorMsg);
+                
+                setTimeout(() => {
+                    errorMsg.style.opacity = '1';
+                }, 10);
+                
+                setTimeout(() => {
+                    errorMsg.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(errorMsg);
+                    }, 300);
+                }, 2000);
+                
+                puzzleInput.value = '';
+                puzzleInput.focus();
+            }
+        }
+        
+        function celebrate() {
+            // Create confetti
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        function getRandomColor() {
+            const colors = ['#ff6b9d', '#5fd8ff', '#ffe14f', '#a1ff5f'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Image Slider
+        const slider = document.getElementById('slider');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentSlide = 0;
+        
+        function updateSlider() {
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        
+        prevBtn.addEventListener('click', () => {
+            currentSlide = (currentSlide === 0) ? 2 : currentSlide - 1;
+            updateSlider();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            currentSlide = (currentSlide === 2) ? 0 : currentSlide + 1;
+            updateSlider();
+        });
+        
+        // Auto slide change
+        setInterval(() => {
+            currentSlide = (currentSlide === 2) ? 0 : currentSlide + 1;
+            updateSlider();
+        }, 5000);
+        
+        // Diary Pages
+        const pages = document.querySelectorAll('.diary-page');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const currentPageSpan = document.getElementById('currentPage');
+        let currentPage = 0;
+        
+        function updatePage() {
+            pages.forEach((page, index) => {
+                page.classList.toggle('hidden', index !== currentPage);
+            });
+            currentPageSpan.textContent = currentPage + 1;
+            
+            prevPageBtn.disabled = currentPage === 0;
+            nextPageBtn.disabled = currentPage === pages.length - 1;
+        }
+        
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updatePage();
+            }
+        });
+        
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < pages.length - 1) {
+                currentPage++;
+                updatePage();
+            }
+        });
+        
+        updatePage();
+        
+        // Countdown Timer
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        
+        // Target date: April 24, 2025
+        const targetDate = new Date('April 24, 2026 00:00:00').getTime();
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            
+            if (distance < 0) {
+                clearInterval(countdownTimer);
+                document.getElementById('countdown').innerHTML = '<div style="font-size: 2rem;">The adventure has begun!</div>';
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            daysEl.textContent = formatTime(days);
+            hoursEl.textContent = formatTime(hours);
+            minutesEl.textContent = formatTime(minutes);
+            secondsEl.textContent = formatTime(seconds);
+        }
+        
+        function formatTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+        
+        // Update immediately and then every second
+        updateCountdown();
+        const countdownTimer = setInterval(updateCountdown, 1000);
+        
+        // Create animated background elements
+        function createBackgroundElements() {
+            const elements = ['❤', '★', '✿', '♫', '✦', '☀', '☁'];
+            const colors = ['#ff6b9d', '#5fd8ff', '#ffe14f', '#a1ff5f', '#ff866c'];
+            
+            for (let i = 0; i < 20; i++) {
+                const element = document.createElement('div');
+                element.className = 'bg-element';
+                
+                // Choose random decoration
+                if (Math.random() > 0.5) {
+                    element.classList.add('heart');
+                    element.innerHTML = elements[Math.floor(Math.random() * elements.length)];
+                } else {
+                    element.classList.add('circle');
+                }
+                
+                // Random properties
+                element.style.left = Math.random() * 100 + 'vw';
+                element.style.bottom = '-' + Math.random() * 50 + 'px';
+                element.style.color = colors[Math.floor(Math.random() * colors.length)];
+                element.style.opacity = '0.2';
+                element.style.animationDuration = 10 + Math.random() * 20 + 's';
+                element.style.animationDelay = Math.random() * 5 + 's';
+                
+                document.body.appendChild(element);
+            }
+        }
+    </script>
+</body>
+</html>
